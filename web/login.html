@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ImLLM-Login</title>
+  <link rel="stylesheet" href="./src/login.css">
+</head>
+<body>
+<div class="login-container">
+
+  <form class="login-form" action="/api/login" method="post">
+    <h2>Login</h2>
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" placeholder="input username" required>
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="input password" required>
+
+    <input type="submit" value="Login">
+  </form>
+</div>
+</body>
+</html>
