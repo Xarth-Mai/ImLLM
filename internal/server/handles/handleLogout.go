@@ -1,12 +1,12 @@
-package server
+package handles
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-// handleLogin handles the login API endpoint.
-func handleLogin(w http.ResponseWriter, r *http.Request, userPasswd map[string]string) {
+// HandleLogout handles the logout API endpoint.
+func HandleLogout(w http.ResponseWriter, r *http.Request, userToken *map[string]string) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -18,24 +18,24 @@ func handleLogin(w http.ResponseWriter, r *http.Request, userPasswd map[string]s
 	}
 
 	username := r.FormValue("username")
-	password := r.FormValue("password")
+	token := r.FormValue("token")
 
-	if username == "" || password == "" {
-		http.Error(w, "Missing username or password", http.StatusBadRequest)
+	if username == "" || token == "" {
+		http.Error(w, "Missing username or token", http.StatusBadRequest)
 		return
 	}
 
-	if storedPass, ok := userPasswd[username]; ok && storedPass == password {
+	if storedPass, ok := (*userToken)[username]; ok && storedPass == token {
+		(*userToken)[username] = ""
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
-			"message": "Login successful",
-			"token":   "token...",
+			"message": "Logout successful",
 		})
 		if err != nil {
 			http.Error(w, "Encoding response error", http.StatusInternalServerError)
 		}
 	} else {
-		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
+		http.Error(w, "Invalid token", http.StatusUnauthorized)
 	}
 }
