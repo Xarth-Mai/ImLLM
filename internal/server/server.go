@@ -20,11 +20,11 @@ func Run(userPasswd map[string]string) http.HandlerFunc {
 		case "login":
 			handles.HandleLogin(w, r, &userPasswd, &userToken)
 		case "logout":
-			middleware.Auth(handles.HandleLogout(&userToken), userToken)(w, r)
+			middleware.WebAuth(handles.HandleLogout(&userToken), userToken)(w, r)
 		case "chat":
-			middleware.Auth(handles.HandleChat(), userToken)(w, r)
+			middleware.WebAuth(handles.HandleChat(), userToken)(w, r)
 		case "openai":
-			middleware.Auth(openai.HandleOpenAI(), userToken)(w, r)
+			middleware.ApiAuth(openai.HandleOpenAI, userPasswd)(w, r)
 		default:
 			http.Error(w, "Unknown API endpoint", http.StatusNotFound)
 		}

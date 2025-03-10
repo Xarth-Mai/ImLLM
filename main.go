@@ -14,7 +14,11 @@ var userPasswd map[string]string
 const webFS = "./web/"
 
 func main() {
-	config.Init(&addr, &port, &userPasswd)
+	initErr := config.Init(&addr, &port, &userPasswd)
+	if initErr != nil {
+		log.Printf("Config init error: %v", initErr)
+		return
+	}
 
 	http.HandleFunc("/api/", server.Run(userPasswd))
 	http.Handle("/", http.FileServer(http.Dir(webFS)))

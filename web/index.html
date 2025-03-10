@@ -5,6 +5,21 @@
     <title>ImLLM</title>
 </head>
 <body>
+<script>
+    async function fetchChat() {
+        try {
+            const response = await fetch('/api/chat');
+            if (response.status === 200) {
+                window.location.href = '/chat.html';
+            } else {
+                window.location.href = '/login.html';
+            }
+        } catch (error) {
+            console.error('error:', error);
+        }
+    }
 
+    window.addEventListener('load', fetchChat);
+</script>
 </body>
 </html>

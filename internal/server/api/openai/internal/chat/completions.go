@@ -5,5 +5,5 @@ import (
 )
 
 // HandleChatCompletions handles the chat completion API in OpenAI API format.
-func HandleChatCompletions(w http.ResponseWriter, r *http.Request) {
+func HandleChatCompletions(w http.ResponseWriter, r *http.Request, username string) {
 }

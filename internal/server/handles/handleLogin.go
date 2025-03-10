@@ -1,7 +1,6 @@
 package handles
 
 import (
-	"encoding/json"
 	"github.com/Xarth-Mai/ImLLM/internal/server/utils"
 	"log"
 	"net/http"
@@ -27,19 +26,13 @@ func HandleLogin(w http.ResponseWriter, r *http.Request, userPasswd *map[string]
 	if storedPass {
 		token := utils.GenerateToken()
 
-		w.Header().Set("Content-Type", "application/json")
-		err := json.NewEncoder(w).Encode(map[string]string{
-			"status":  "success",
-			"message": "Login successful",
-			"token":   token,
-		})
-		if err != nil {
-			http.Error(w, "Encoding response error", http.StatusInternalServerError)
-			return
-		}
+		utils.SetCookies(w, username, token)
+
 		(*userToken)[username] = token
 
 		log.Printf("User '%s' logged in", username)
+
+		http.Redirect(w, r, "/", http.StatusFound)
 	} else {
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 	}
