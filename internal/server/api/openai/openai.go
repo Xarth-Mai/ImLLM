@@ -4,6 +4,7 @@ import (
 	"github.com/Xarth-Mai/ImLLM/internal/server/api/openai/internal/chat"
 	"github.com/Xarth-Mai/ImLLM/internal/server/api/openai/internal/models"
 	"net/http"
+	"strings"
 )
 
 // HandleOpenAI is the main function for the OpenAI API
@@ -13,11 +14,12 @@ func HandleOpenAI(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "username missing", http.StatusUnauthorized)
 		return
 	}
+	apiPath := strings.TrimPrefix(r.URL.Path, "/openai/")
 
-	switch r.URL.Path {
-	case "/openai/models":
+	switch apiPath {
+	case "models":
 		models.HandleModels(w, username)
-	case "/openai/chat/completions":
+	case "chat/completions":
 		chat.HandleChatCompletions(w, r, username)
 	default:
 		http.Error(w, "Not Found", http.StatusNotFound)

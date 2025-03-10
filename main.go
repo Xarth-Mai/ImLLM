@@ -21,6 +21,7 @@ func main() {
 	}
 
 	http.HandleFunc("/api/", server.Run(userPasswd))
+	http.HandleFunc("/openai/", server.Run(userPasswd))
 	http.Handle("/", http.FileServer(http.Dir(webFS)))
 
 	log.Printf("Server is starting, listening on http://%s:%s", addr, port)

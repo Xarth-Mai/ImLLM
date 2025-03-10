@@ -14,15 +14,21 @@ func Run(userPasswd map[string]string) http.HandlerFunc {
 	var userToken = utils.GenerateUserMap(userPasswd)
 
 	return func(w http.ResponseWriter, r *http.Request) {
-		apiPath := strings.TrimPrefix(r.URL.Path, "/api/")
+		path := strings.TrimPrefix(r.URL.Path, "/")
+		segments := strings.SplitN(path, "/", 2)
 
-		switch apiPath {
-		case "login":
-			handles.HandleLogin(w, r, &userPasswd, &userToken)
-		case "logout":
-			middleware.WebAuth(handles.HandleLogout(&userToken), userToken)(w, r)
-		case "chat":
-			middleware.WebAuth(handles.HandleChat(), userToken)(w, r)
+		switch segments[0] {
+		case "api":
+			switch segments[1] {
+			case "login":
+				handles.HandleLogin(w, r, &userPasswd, &userToken)
+			case "logout":
+				middleware.WebAuth(handles.HandleLogout(&userToken), userToken)(w, r)
+			case "chat":
+				middleware.WebAuth(handles.HandleChat(), userToken)(w, r)
+			default:
+				http.Error(w, "Unknown API endpoint", http.StatusNotFound)
+			}
 		case "openai":
 			middleware.ApiAuth(openai.HandleOpenAI, userPasswd)(w, r)
 		default:
