@@ -7,13 +7,15 @@ import (
 )
 
 // HandleOpenAI is the main function for the OpenAI API
-func HandleOpenAI(w http.ResponseWriter, r *http.Request, userToken *map[string]string) {
-	switch r.URL.Path {
-	case "/models":
-		models.HandleModels(w, r, userToken)
-	case "/chat/completions":
-		chat.HandleChatCompletions(w, r, userToken)
-	default:
-		http.Error(w, "Not Found", http.StatusNotFound)
+func HandleOpenAI() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/models":
+			models.HandleModels(w, r)
+		case "/chat/completions":
+			chat.HandleChatCompletions(w, r)
+		default:
+			http.Error(w, "Not Found", http.StatusNotFound)
+		}
 	}
 }

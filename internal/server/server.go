@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/Xarth-Mai/ImLLM/internal/server/api/openai"
 	"github.com/Xarth-Mai/ImLLM/internal/server/handles"
+	"github.com/Xarth-Mai/ImLLM/internal/server/middleware"
 	"github.com/Xarth-Mai/ImLLM/internal/server/utils"
 	"net/http"
 	"strings"
@@ -10,22 +11,20 @@ import (
 
 // Run starts the server and handles the api requests
 func Run(userPasswd map[string]string) http.HandlerFunc {
-	var UserMap = utils.GenerateUserMap(userPasswd)
-	var userToken = UserMap
-	var userTokenSeed = UserMap
+	var userToken = utils.GenerateUserMap(userPasswd)
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		apiPath := strings.TrimPrefix(r.URL.Path, "/api/")
 
 		switch apiPath {
 		case "login":
-			handles.HandleLogin(w, r, &userPasswd, &userTokenSeed, &userToken)
+			handles.HandleLogin(w, r, &userPasswd, &userToken)
 		case "logout":
-			handles.HandleLogout(w, r, &userToken)
+			middleware.Auth(handles.HandleLogout(&userToken), userToken)(w, r)
 		case "chat":
-			handles.HandleChat(w, r, &userToken)
+			middleware.Auth(handles.HandleChat(), userToken)(w, r)
 		case "openai":
-			openai.HandleOpenAI(w, r, &userToken)
+			middleware.Auth(openai.HandleOpenAI(), userToken)(w, r)
 		default:
 			http.Error(w, "Unknown API endpoint", http.StatusNotFound)
 		}

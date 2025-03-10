@@ -3,11 +3,12 @@ package handles
 import (
 	"encoding/json"
 	"github.com/Xarth-Mai/ImLLM/internal/server/utils"
+	"log"
 	"net/http"
 )
 
 // HandleLogin handles the login API endpoint.
-func HandleLogin(w http.ResponseWriter, r *http.Request, userPasswd *map[string]string, userTokenSeed *map[string]string, userToken *map[string]string) {
+func HandleLogin(w http.ResponseWriter, r *http.Request, userPasswd *map[string]string, userToken *map[string]string) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
@@ -21,13 +22,10 @@ func HandleLogin(w http.ResponseWriter, r *http.Request, userPasswd *map[string]
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 
-	if username == "" || password == "" {
-		http.Error(w, "Missing username or password", http.StatusBadRequest)
-		return
-	}
+	storedPass := utils.ValidateMap(*userPasswd, username, password)
 
-	if userPasswd, ok := (*userPasswd)[username]; ok && userPasswd == password {
-		token := utils.GenerateToken(userTokenSeed, username)
+	if storedPass {
+		token := utils.GenerateToken()
 
 		w.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(w).Encode(map[string]string{
@@ -40,6 +38,8 @@ func HandleLogin(w http.ResponseWriter, r *http.Request, userPasswd *map[string]
 			return
 		}
 		(*userToken)[username] = token
+
+		log.Printf("User '%s' logged in", username)
 	} else {
 		http.Error(w, "Invalid username or password", http.StatusUnauthorized)
 	}

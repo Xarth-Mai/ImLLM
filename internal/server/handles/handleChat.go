@@ -1,9 +1,7 @@
 package handles
 
-import (
-	"net/http"
-)
+import "net/http"
 
-func HandleChat(w http.ResponseWriter, r *http.Request, userToken *map[string]string) {
-
+func HandleChat() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {}
 }

@@ -17,7 +17,7 @@
 
 *(Pretend this is a preview image.)*
 
-## Usage
+## Value
 
 This program is useful when another application requires an LLM API but the responses from an actual API are unsatisfactory. It allows you to manually provide responses for testing or practical usage.
 
