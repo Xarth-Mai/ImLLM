@@ -1,8 +1,8 @@
 package openai
 
 import (
-	"github.com/Xarth-Mai/ImLLM/internal/server/api/openai/internal/chat"
-	"github.com/Xarth-Mai/ImLLM/internal/server/api/openai/internal/models"
+	"github.com/Xarth-Mai/ImLLM/internal/server/api/openai/chat"
+	"github.com/Xarth-Mai/ImLLM/internal/server/api/openai/models"
 	"net/http"
 	"strings"
 )
