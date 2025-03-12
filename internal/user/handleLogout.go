@@ -1,7 +1,7 @@
-package handles
+package user
 
 import (
-	"github.com/Xarth-Mai/ImLLM/internal/user/utils"
+	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"log"
 	"net/http"
 )
