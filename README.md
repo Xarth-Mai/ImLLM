@@ -10,8 +10,8 @@
 - **LLM API Gateway**  
   Supports various mainstream LLM API formats, ensuring seamless integration with different LLM services.
 
-  **Planned API Support:**
-  - [ ] OpenAI API
+  **API Support:**
+  - [x] OpenAI API
 
 ## Preview
 
