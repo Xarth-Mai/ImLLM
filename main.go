@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/Xarth-Mai/ImLLM/internal/api/openai"
 	"github.com/Xarth-Mai/ImLLM/internal/config"
+	"github.com/Xarth-Mai/ImLLM/internal/middleware"
 	"github.com/Xarth-Mai/ImLLM/internal/user"
 	"log"
 	"net/http"
@@ -19,7 +20,7 @@ func main() {
 	}
 
 	http.HandleFunc("/user/", user.HandleUser(UserConfig.UserPasswd))
-	http.HandleFunc("/openai/", openai.HandleOpenAI(UserConfig.UserPasswd))
+	http.HandleFunc("/openai/", middleware.ApiAuth(openai.HandleOpenAI, UserConfig.UserPasswd))
 	http.Handle("/", http.FileServer(http.Dir(webFS)))
 
 	log.Printf("Server is starting, listening on http://%s:%s", UserConfig.Addr, UserConfig.Port)

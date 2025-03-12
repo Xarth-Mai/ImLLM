@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// ApiAuth is a middleware that checks if the user is logged in
+// ApiAuth is a middleware that checks the apikey and wraps the request context with the username
 func ApiAuth(next http.HandlerFunc, userPasswd map[string]string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

@@ -2,6 +2,7 @@ package user
 
 import (
 	"github.com/Xarth-Mai/ImLLM/internal/middleware"
+	"github.com/Xarth-Mai/ImLLM/internal/user/chat"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"net/http"
 	"strings"
@@ -20,7 +21,7 @@ func HandleUser(userPasswd map[string]string) http.HandlerFunc {
 		case "logout":
 			middleware.WebAuth(HandleLogout(&userToken), userToken)(w, r)
 		case "chat":
-			middleware.WebAuth(HandleChat(), userToken)(w, r)
+			middleware.WebAuth(chat.HandleChat, userToken)(w, r)
 		default:
 			http.Error(w, "Unknown API endpoint", http.StatusNotFound)
 		}
