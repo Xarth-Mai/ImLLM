@@ -2,6 +2,7 @@ package config
 
 import (
 	"gopkg.in/yaml.v3"
+	"log"
 	"os"
 )
 
@@ -14,14 +15,21 @@ type Config struct {
 
 // InitConfig initializes the configuration from the yaml file.
 func InitConfig(configPath string) (Config, error) {
-
+	var config Config
 	// Read the configuration file content
 	data, err := os.ReadFile(configPath)
 	if err != nil {
-		return Config{}, err
+		if os.IsNotExist(err) {
+			log.Println("Config file does not exist, creating a new one...")
+			config, err = CreateConfig(configPath)
+			if err != nil {
+				return Config{}, err
+			}
+		} else {
+			return Config{}, err
+		}
 	}
 
-	var config Config
 	// Parse YAML data into the config struct
 	if err := yaml.Unmarshal(data, &config); err != nil {
 		return Config{}, err
