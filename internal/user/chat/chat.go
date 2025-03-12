@@ -4,8 +4,16 @@ import (
 	"fmt"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"github.com/gorilla/websocket"
+	"log"
 	"net/http"
 	"sync"
+	"time"
+)
+
+const (
+	pongWait   = 60 * time.Second
+	pingPeriod = (pongWait * 9) / 10
+	writeWait  = 10 * time.Second
 )
 
 // upgrader is the websocket upgrader.
@@ -42,6 +50,20 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// set read deadline
+	err = conn.SetReadDeadline(time.Now().Add(pongWait))
+	if err != nil {
+		return
+	}
+	// set write deadline
+	conn.SetPongHandler(func(string) error {
+		err := conn.SetReadDeadline(time.Now().Add(pongWait))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
 	client := &Client{
 		Username: username,
 		Conn:     conn,
@@ -51,14 +73,36 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	clients[username] = client
 	clientsMu.Unlock()
 
-	fmt.Printf("User %s connected.\n", username)
+	log.Printf("User %s connected.\n", username)
+
+	// Handle Pings from the client.
+	go func(c *Client) {
+		ticker := time.NewTicker(pingPeriod)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				// set write deadline
+				err := c.Conn.SetWriteDeadline(time.Now().Add(writeWait))
+				if err != nil {
+					log.Printf("Set write deadline error: %v\n", err)
+				}
+				// send ping message
+				if err := c.Conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+					return
+				}
+			}
+		}
+	}(client)
 
 	// Handle messages from the client.
 	func(client *Client) {
 		for {
 			_, message, err := client.Conn.ReadMessage()
 			if err != nil {
-				client.ReplyChan <- nil
+				if client.ReplyChan != nil {
+					client.ReplyChan <- nil
+				}
 				break
 			}
 			// if client.ReplyChan is not nil, then send the message to the ReplyChan
@@ -66,10 +110,10 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 				select {
 				case client.ReplyChan <- message:
 				default:
-					fmt.Printf("Received from %s (undelivered): %s\n", client.Username, message)
+					log.Printf("Received from %s (undelivered): %s\n", client.Username, message)
 				}
 			} else {
-				fmt.Printf("Received from %s: %s\n", client.Username, message)
+				log.Printf("Received from %s: %s\n", client.Username, message)
 			}
 		}
 	}(client)
@@ -81,5 +125,5 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	fmt.Printf("User %s disconnected.\n", username)
+	log.Printf("User %s disconnected.\n", username)
 }
