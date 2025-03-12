@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-// https://platform.openai.com/docs/api-reference/chat/create
+// reference: https://platform.openai.com/docs/api-reference/chat/create
 
 // Response defines the response data structure
 type Response struct {

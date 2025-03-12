@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ImLLM-Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #chat {
+      border: 1px solid #ccc;
+      padding: 10px;
+      width: 400px;
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+    }
+    #input {
+      width: 320px;
+    }
+    #send {
+      width: 60px;
+    }
+  </style>
+</head>
+<body>
+<h2>Chat Page</h2>
+<div id="chat"></div>
+<label for="input"></label><input type="text" id="input" placeholder="Please enter a message...">
+<button id="send">Send</button>
+
+<script>
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const host = window.location.host;
+  const ws = new WebSocket(`${protocol}//${host}/user/chat`);
+
+  const chatDiv = document.getElementById("chat");
+  const input = document.getElementById("input");
+  const sendButton = document.getElementById("send");
+
+  function displayMessage(message) {
+    const p = document.createElement("p");
+    p.innerText = message;
+    chatDiv.appendChild(p);
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+  }
+
+  ws.onopen = function() {
+    displayMessage("Connection established (Connection established)");
+  };
+
+  ws.onmessage = function(event) {
+    displayMessage("Received message: " + event.data);
+  };
+
+  ws.onclose = function() {
+    displayMessage("Connection closed (Connection closed)");
+  };
+
+  ws.onerror = function(error) {
+    console.error("WebSocket error: ", error);
+  };
+
+  function sendMessage() {
+    const message = input.value.trim();
+    if (message === "") {
+      return;
+    }
+    ws.send(message);
+    displayMessage("Sent: " + message);
+    input.value = "";
+  }
+
+  sendButton.addEventListener("click", sendMessage);
+
+  input.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+      sendMessage();
+    }
+  });
+</script>
+</body>
+</html>

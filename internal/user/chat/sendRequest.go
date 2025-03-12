@@ -32,6 +32,10 @@ func SendRequest(username string, request Request) (string, error) {
 	client.Mutex.Lock()
 	defer client.Mutex.Unlock()
 
+	// Create a reply channel
+	client.ReplyChan = make(chan []byte, 1)
+	defer func() { client.ReplyChan = nil }()
+
 	reqBytes, err := json.Marshal(request)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal request: %v", err)
@@ -41,15 +45,12 @@ func SendRequest(username string, request Request) (string, error) {
 		return "", fmt.Errorf("failed to send request: %v", err)
 	}
 
-	err = client.Conn.SetReadDeadline(time.Now().Add(600 * time.Second))
-	if err != nil {
-		return "", err
+	// Wait for reply
+	timeout := time.After(30 * time.Second)
+	select {
+	case reply := <-client.ReplyChan:
+		return string(reply), nil
+	case <-timeout:
+		return "", fmt.Errorf("timeout waiting for reply")
 	}
-
-	_, reply, err := client.Conn.ReadMessage()
-	if err != nil {
-		return "", fmt.Errorf("failed to read reply: %v", err)
-	}
-
-	return string(reply), nil
 }

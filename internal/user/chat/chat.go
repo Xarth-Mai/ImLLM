@@ -12,7 +12,7 @@ import (
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
-	// 简单允许所有跨域请求
+	// Allow all origins.
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	},
@@ -20,9 +20,10 @@ var upgrader = websocket.Upgrader{
 
 // Client is a websocket client.
 type Client struct {
-	Username string
-	Conn     *websocket.Conn
-	Mutex    sync.Mutex
+	Username  string
+	Conn      *websocket.Conn
+	Mutex     sync.Mutex
+	ReplyChan chan []byte
 }
 
 // clients is the map of all connected clients.
@@ -52,14 +53,26 @@ func HandleChat(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("User %s connected.\n", username)
 
-	for {
-		_, message, err := conn.ReadMessage()
-		if err != nil {
-			fmt.Printf("Read error from %s: %v\n", username, err)
-			break
+	// Handle messages from the client.
+	func(client *Client) {
+		for {
+			_, message, err := client.Conn.ReadMessage()
+			if err != nil {
+				client.ReplyChan <- nil
+				break
+			}
+			// if client.ReplyChan is not nil, then send the message to the ReplyChan
+			if client.ReplyChan != nil {
+				select {
+				case client.ReplyChan <- message:
+				default:
+					fmt.Printf("Received from %s (undelivered): %s\n", client.Username, message)
+				}
+			} else {
+				fmt.Printf("Received from %s: %s\n", client.Username, message)
+			}
 		}
-		fmt.Printf("Received from %s: %s\n", username, message)
-	}
+	}(client)
 
 	clientsMu.Lock()
 	delete(clients, username)

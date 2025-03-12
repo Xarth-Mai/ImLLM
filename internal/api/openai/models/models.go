@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// https://platform.openai.com/docs/api-reference/models
+// reference: https://platform.openai.com/docs/api-reference/models
 
 // Model defines the model structure for the Models API
 type Model struct {
