@@ -8,7 +8,7 @@
 <script>
     async function fetchChat() {
         try {
-            const response = await fetch('/user/chat');
+            const response = await fetch('/user/');
             if (response.status === 200) {
                 window.location.href = '/chat.html';
             } else {

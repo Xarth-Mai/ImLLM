@@ -23,7 +23,7 @@ func HandleUser(userPasswd map[string]string) http.HandlerFunc {
 		case "chat":
 			middleware.WebAuth(chat.HandleChat, userToken)(w, r)
 		default:
-			http.Error(w, "Unknown API endpoint", http.StatusNotFound)
+			middleware.WebAuth(HandleOK, userToken)(w, r)
 		}
 	}
 }

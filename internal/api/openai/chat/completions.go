@@ -2,9 +2,14 @@ package chat
 
 import (
 	"encoding/json"
+	"github.com/Xarth-Mai/ImLLM/internal/user/chat"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"net/http"
+	"strconv"
+	"time"
 )
+
+// https://platform.openai.com/docs/api-reference/chat/create
 
 // Response defines the response data structure
 type Response struct {
@@ -19,16 +24,10 @@ type Response struct {
 
 // Choice defines the choice data structure
 type Choice struct {
-	Index        int     `json:"index"`
-	Message      Message `json:"message"`
-	Logprobs     any     `json:"logprobs"`
-	FinishReason string  `json:"finish_reason"`
-}
-
-// Message defines the message data structure
-type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Index        int          `json:"index"`
+	Message      chat.Message `json:"message"`
+	Logprobs     any          `json:"logprobs"`
+	FinishReason string       `json:"finish_reason"`
 }
 
 // Usage defines the usage data structure
@@ -48,29 +47,46 @@ type CompletionTokensDetails struct {
 
 // HandleChatCompletions handles the chat completions API request
 func HandleChatCompletions(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
 	username := utils.GetUsername(r)
 
+	var req chat.Request
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	content, err := chat.SendRequest(username, req)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response := Response{
-		ID:                username,
+		ID:                username + strconv.FormatInt(time.Now().Unix(), 10),
 		Object:            "chat.completion",
-		Created:           1677652288,
-		Model:             "gpt-4o-mini",
-		SystemFingerprint: "fp_44709d6fcb",
+		Created:           time.Now().Unix(),
+		Model:             username,
+		SystemFingerprint: username,
 		Choices: []Choice{
 			{
 				Index: 0,
-				Message: Message{
+				Message: chat.Message{
 					Role:    "assistant",
-					Content: "\n\nHello there, how may I assist you today?",
+					Content: content,
 				},
 				Logprobs:     nil,
 				FinishReason: "stop",
 			},
 		},
 		Usage: Usage{
-			PromptTokens:     9,
-			CompletionTokens: 12,
-			TotalTokens:      21,
+			PromptTokens:     1000,
+			CompletionTokens: 1000,
+			TotalTokens:      2000,
 			CompletionTokensDetails: CompletionTokensDetails{
 				ReasoningTokens:          0,
 				AcceptedPredictionTokens: 0,
