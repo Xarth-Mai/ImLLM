@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/Xarth-Mai/ImLLM/internal/middleware"
-	"github.com/Xarth-Mai/ImLLM/internal/user/chat"
+	"github.com/Xarth-Mai/ImLLM/internal/user/dialog"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"net/http"
 	"strings"
@@ -20,8 +20,8 @@ func HandleUser(userPasswd map[string]string) http.HandlerFunc {
 			HandleLogin(w, r, &userPasswd, &userToken)
 		case "logout":
 			middleware.WebAuth(HandleLogout(&userToken), userToken)(w, r)
-		case "chat":
-			middleware.WebAuth(chat.HandleChat, userToken)(w, r)
+		case "dialog":
+			middleware.WebAuth(dialog.HandleDialog, userToken)(w, r)
 		default:
 			middleware.WebAuth(HandleOK, userToken)(w, r)
 		}

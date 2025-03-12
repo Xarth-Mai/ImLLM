@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ImLLM-Chat</title>
+  <title>ImLLM-Dialog</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
     }
-    #chat {
+    #dialog {
       border: 1px solid #ccc;
       padding: 10px;
       width: 400px;
@@ -25,25 +25,25 @@
   </style>
 </head>
 <body>
-<h2>Chat Page</h2>
-<div id="chat"></div>
+<h2>Dialog Page</h2>
+<div id="dialog"></div>
 <label for="input"></label><input type="text" id="input" placeholder="Please enter a message...">
 <button id="send">Send</button>
 
 <script>
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
   const host = window.location.host;
-  const ws = new WebSocket(`${protocol}//${host}/user/chat`);
+  const ws = new WebSocket(`${protocol}//${host}/user/dialog`);
 
-  const chatDiv = document.getElementById("chat");
+  const dialogDiv = document.getElementById("dialog");
   const input = document.getElementById("input");
   const sendButton = document.getElementById("send");
 
   function displayMessage(message) {
     const p = document.createElement("p");
     p.innerText = message;
-    chatDiv.appendChild(p);
-    chatDiv.scrollTop = chatDiv.scrollHeight;
+    dialogDiv.appendChild(p);
+    dialogDiv.scrollTop = dialogDiv.scrollHeight;
   }
 
   ws.onopen = function() {

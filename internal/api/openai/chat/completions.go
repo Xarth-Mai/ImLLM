@@ -2,7 +2,7 @@ package chat
 
 import (
 	"encoding/json"
-	"github.com/Xarth-Mai/ImLLM/internal/user/chat"
+	"github.com/Xarth-Mai/ImLLM/internal/user/dialog"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"net/http"
 	"strconv"
@@ -24,10 +24,10 @@ type Response struct {
 
 // Choice defines the choice data structure
 type Choice struct {
-	Index        int          `json:"index"`
-	Message      chat.Message `json:"message"`
-	Logprobs     any          `json:"logprobs"`
-	FinishReason string       `json:"finish_reason"`
+	Index        int            `json:"index"`
+	Message      dialog.Message `json:"message"`
+	Logprobs     any            `json:"logprobs"`
+	FinishReason string         `json:"finish_reason"`
 }
 
 // Usage defines the usage data structure
@@ -53,14 +53,14 @@ func HandleChatCompletions(w http.ResponseWriter, r *http.Request) {
 	}
 	username := utils.GetUsername(r)
 
-	var req chat.Request
+	var req dialog.Request
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	content, err := chat.SendRequest(username, req)
+	content, err := dialog.SendRequest(username, req)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -75,7 +75,7 @@ func HandleChatCompletions(w http.ResponseWriter, r *http.Request) {
 		Choices: []Choice{
 			{
 				Index: 0,
-				Message: chat.Message{
+				Message: dialog.Message{
 					Role:    "assistant",
 					Content: content,
 				},

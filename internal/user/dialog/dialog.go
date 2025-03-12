@@ -1,4 +1,4 @@
-package chat
+package dialog
 
 import (
 	"fmt"
@@ -40,8 +40,8 @@ var (
 	clientsMu sync.RWMutex
 )
 
-// HandleChat is the main function for the chat API
-func HandleChat(w http.ResponseWriter, r *http.Request) {
+// HandleDialog is the main function for the chat API
+func HandleDialog(w http.ResponseWriter, r *http.Request) {
 	username := utils.GetCookieValue(r, "username")
 
 	conn, err := upgrader.Upgrade(w, r, nil)
