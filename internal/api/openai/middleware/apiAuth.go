@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"context"
-	"github.com/Xarth-Mai/ImLLM/internal/server/utils"
+	"github.com/Xarth-Mai/ImLLM/internal/user/utils"
 	"net/http"
 	"strings"
 )

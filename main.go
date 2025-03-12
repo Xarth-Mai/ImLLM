@@ -1,33 +1,30 @@
 package main
 
 import (
+	"github.com/Xarth-Mai/ImLLM/internal/api/openai"
 	"github.com/Xarth-Mai/ImLLM/internal/config"
-	"github.com/Xarth-Mai/ImLLM/internal/server"
+	"github.com/Xarth-Mai/ImLLM/internal/user"
 	"log"
 	"net/http"
 )
 
-var addr string
-var port string
-var userPasswd map[string]string
-
 const webFS = "./web/"
+const configPath = "./config.yaml"
 
 func main() {
-	initErr := config.Init(&addr, &port, &userPasswd)
+	UserConfig, initErr := config.InitConfig(configPath)
 	if initErr != nil {
 		log.Printf("Config init error: %v", initErr)
 		return
 	}
 
-	http.HandleFunc("/api/", server.Run(userPasswd))
-	http.HandleFunc("/openai/", server.Run(userPasswd))
+	http.HandleFunc("/user/", user.HandleUser(UserConfig.UserPasswd))
+	http.HandleFunc("/openai/", openai.HandleOpenAI(UserConfig.UserPasswd))
 	http.Handle("/", http.FileServer(http.Dir(webFS)))
 
-	log.Printf("Server is starting, listening on http://%s:%s", addr, port)
+	log.Printf("Server is starting, listening on http://%s:%s", UserConfig.Addr, UserConfig.Port)
 
-	err := http.ListenAndServe(addr+":"+port, nil)
-	if err != nil {
+	if err := http.ListenAndServe(UserConfig.Addr+":"+UserConfig.Port, nil); err != nil {
 		log.Fatal("ListenAndServe error: ", err)
 	}
 }

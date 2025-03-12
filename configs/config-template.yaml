@@ -1,0 +1,5 @@
+Port: "4000"
+Addr: "localhost"
+UserPasswd:
+  admin: "passwd"
+  admin1: "passwd1"

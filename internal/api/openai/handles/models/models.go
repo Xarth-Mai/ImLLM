@@ -2,6 +2,7 @@ package models
 
 import (
 	"encoding/json"
+	"github.com/Xarth-Mai/ImLLM/internal/api/openai/utils"
 	"net/http"
 )
 
@@ -20,13 +21,14 @@ type Response struct {
 }
 
 // HandleModels is the main function for the Models API
-func HandleModels(w http.ResponseWriter, username string) {
+func HandleModels(w http.ResponseWriter, r *http.Request) {
+	username := utils.GetUsername(r)
 	w.Header().Set("Content-Type", "application/json")
 
 	models := []Model{
 		{
 			ID:      username,
-			Object:  "model",
+			Object:  "gpt-4o-mini",
 			Created: 1700000000,
 			OwnedBy: username,
 		},
