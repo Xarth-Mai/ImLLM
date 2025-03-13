@@ -42,7 +42,7 @@ func HandleDialog(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println("Upgrade error:", err)
+		fmt.Printf("User '%s' is connecting error: %v\n", username, err)
 		return
 	}
 
@@ -65,11 +65,21 @@ func HandleDialog(w http.ResponseWriter, r *http.Request) {
 		Conn:     conn,
 	}
 
+	log.Printf("User '%s' is connecting\n", username)
 	clientsMu.Lock()
+	if clients[username] != nil {
+		// if the username is already in the map, close the connection
+		err := clients[username].Conn.Close()
+		log.Printf("User '%s' is already in the map, closing the previous connection\n", username)
+		if err != nil {
+			log.Printf("Close connection of User '%s' error: %v\n", username, err)
+			return
+		}
+	}
 	clients[username] = client
 	clientsMu.Unlock()
 
-	log.Printf("User %s connected.\n", username)
+	log.Printf("User '%s' connected\n", username)
 
 	// Handle Pings from the client.
 	go func(c *Client) {
@@ -106,10 +116,10 @@ func HandleDialog(w http.ResponseWriter, r *http.Request) {
 				select {
 				case client.ReplyChan <- message:
 				default:
-					log.Printf("Received from %s (undelivered): %s\n", client.Username, message)
+					log.Printf("Received from user '%s' (undelivered): %s\n", client.Username, message)
 				}
 			} else {
-				log.Printf("Received from %s: %s\n", client.Username, message)
+				log.Printf("Received from user '%s': %s\n", client.Username, message)
 			}
 		}
 	}(client)
@@ -121,5 +131,5 @@ func HandleDialog(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	log.Printf("User %s disconnected.\n", username)
+	log.Printf("User '%s' disconnected\n", username)
 }
