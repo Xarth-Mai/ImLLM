@@ -9,7 +9,7 @@ import (
 
 // HandleOpenAI is the main function for the OpenAI API
 func HandleOpenAI(w http.ResponseWriter, r *http.Request) {
-	apiPath := strings.TrimPrefix(r.URL.Path, "/openai/")
+	apiPath := strings.TrimPrefix(r.URL.Path, "/openai/v1/")
 
 	switch apiPath {
 	case "models":
