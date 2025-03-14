@@ -125,7 +125,9 @@ func HandleDialog(w http.ResponseWriter, r *http.Request) {
 	}(client)
 
 	clientsMu.Lock()
-	delete(clients, username)
+	if clients[username] == client {
+		delete(clients, username)
+	}
 	clientsMu.Unlock()
 	err = conn.Close()
 	if err != nil {
