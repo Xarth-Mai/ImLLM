@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	pongWait   = 60 * time.Second
-	pingPeriod = (pongWait * 9) / 10
+	pongWait   = 15 * time.Second
+	pingPeriod = (pongWait * 8) / 10
 	writeWait  = 10 * time.Second
 )
 
