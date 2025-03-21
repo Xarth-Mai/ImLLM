@@ -15,7 +15,20 @@
 
 ## Preview
 
-*(Pretend this is a preview image.)*
+![Preview](preview.png)
+
+## Usage
+
+### 1. Run & Configure
+
+### 2. Login
+
+### 3. Use API
+
+`ApiKey = username + ";" + password`
+
+- `GET /openai/v1/models` Get the list of models.
+- `POST /openai/v1/chat/completions` Create a chat completion.
 
 ## Value
 
