@@ -1,0 +1,47 @@
+name: Go Build && Test
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: 'go.mod'
+
+      - name: Install dependencies
+        run: go get .
+
+      - name: Build Linux binary
+        run: |
+          go build -v -o ImLLM-linux ./
+
+      - name: Build Windows binary (cross compile)
+        run: |
+          GOOS=windows GOARCH=amd64 go build -v -o ImLLM-windows.exe ./
+
+      - name: Test with Go
+        run: go test -json > TestResults.json
+
+      - name: Upload Go test results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Go-results
+          path: TestResults.json
+
+      - name: Upload Linux build results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Go-Build-Linux
+          path: ImLLM-linux
+
+      - name: Upload Windows build results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Go-Build-Windows
+          path: ImLLM-windows.exe
