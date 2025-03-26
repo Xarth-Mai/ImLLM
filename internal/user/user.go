@@ -1,8 +1,8 @@
 package user
 
 import (
+	"github.com/Xarth-Mai/ImLLM/internal/dialog"
 	"github.com/Xarth-Mai/ImLLM/internal/middleware"
-	"github.com/Xarth-Mai/ImLLM/internal/user/dialog"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"net/http"
 	"strings"

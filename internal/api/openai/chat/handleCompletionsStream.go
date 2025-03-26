@@ -2,7 +2,7 @@ package chat
 
 import (
 	"encoding/json"
-	"github.com/Xarth-Mai/ImLLM/internal/user/dialog"
+	"github.com/Xarth-Mai/ImLLM/internal/dialog"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"net/http"
 	"strconv"

@@ -2,7 +2,7 @@ package chat
 
 import (
 	"encoding/json"
-	"github.com/Xarth-Mai/ImLLM/internal/user/dialog"
+	"github.com/Xarth-Mai/ImLLM/internal/dialog"
 	"github.com/Xarth-Mai/ImLLM/internal/utils"
 	"net/http"
 	"strconv"
@@ -20,7 +20,7 @@ type Response struct {
 	Usage             Usage    `json:"usage"`
 }
 
-// Choice defines the choice data structure in non sream responses
+// Choice defines the choice data structure in non stream responses
 type Choice struct {
 	Index        int            `json:"index"`
 	Message      dialog.Message `json:"message"`
